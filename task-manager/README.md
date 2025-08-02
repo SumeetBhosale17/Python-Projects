@@ -45,20 +45,23 @@ task_manager/
 ```bash
 python main.py --add "Learn ML" --priority "High" --due "2025-08-01"
 ```
+```bash
+python main.py -tasklist extra --add "Play Game" --priority Low --due 2025-09-01
+```
 
 2. View Tasks
 ```bash
-python main.py --view
+python main.py -tasklist tasks --view
 ```
 
 3. Complete a Task
 ```bash
-python main.py complete 1
+python main.py -tasklist extra --complete 1
 ```
 
 4. Delete a Task
 ```bash
-python main.py delete 1
+python main.py -tasklist tasks --delete 1
 ```
 
 5. Show Summary
