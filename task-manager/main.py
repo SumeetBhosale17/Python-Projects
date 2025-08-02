@@ -15,17 +15,17 @@ def show_menu():
           f"\n---Task Manager [{get_current_file().split('.')[0]}]---\n"
           + Style.RESET_ALL)
     print(Fore.YELLOW + "1. Add Task")
-    print(Fore.BLUE + "2. View Tasks")
-    print(Fore.LIGHTGREEN_EX + "3. Mark Task as Completed")
-    print(Fore.LIGHTRED_EX + "4. Delete Task")
-    print(Fore.LIGHTBLUE_EX + "5. Move Task Up")
-    print(Fore.LIGHTBLACK_EX + "6. Move Task Down")
+    print(Fore.YELLOW + "2. View Tasks")
+    print(Fore.YELLOW + "3. Mark Task as Completed")
+    print(Fore.YELLOW + "4. Delete Task")
+    print(Fore.YELLOW + "5. Move Task Up")
+    print(Fore.YELLOW + "6. Move Task Down")
     print(Fore.YELLOW + "7. Search Tasks")
-    print(Fore.LIGHTYELLOW_EX + "8. Clear Completed Tasks")
-    print(Fore.LIGHTMAGENTA_EX + "9. Tasks Summary")
-    print(Fore.BLACK + "10. Switch Task List")
-    print(Fore.LIGHTWHITE_EX + "11. Undo Last Action")
-    print(Fore.RED + "12. Exit" + Style.RESET_ALL)
+    print(Fore.YELLOW + "8. Clear Completed Tasks")
+    print(Fore.YELLOW + "9. Tasks Summary")
+    print(Fore.YELLOW + "10. Switch Task List")
+    print(Fore.YELLOW + "11. Undo Last Action")
+    print(Fore.YELLOW + "12. Exit" + Style.RESET_ALL)
 
 
 def main():
@@ -39,7 +39,8 @@ def main():
         if choice == 1:
             title = input("Enter task title: ")
             priority = input("Enter priority (High/Medium/Low): ")
-            add_task(title, priority)
+            duedate = input("Enter Due Date: ")
+            add_task(title=title, priority=priority, due_date=duedate)
         elif choice == 2:
             view_tasks()
         elif choice == 3:
@@ -94,25 +95,38 @@ def main():
 def parse_args():
     parser = argparse.ArgumentParser(description="Task Manager CLI")
 
+    parser.add_argument(
+        "-tasklist",
+        type=str,
+        metavar="TASK_LIST",
+        help="Name of the list to use: "
+    )
+
     parser.add_argument("--add", type=str, help="Add new task with title")
-    parser.add_argument("--priority", type=str, default="Medium", help="Priority of the task")
-    parser.add_argument("--due", type=str, help="Due date of the task (YYYY-MM-DD)")
+    parser.add_argument("--priority", type=str, choices=["Low", "Medium", "High"], default="Medium", help="Priority of the task")
+    parser.add_argument("--due", type=str, help="Due date of the task (YYYY-MM-DD)", default=None)
 
     parser.add_argument("--view", action="store_true", help="View all tasks")
     parser.add_argument("--summary", action="store_true", help="Show task summary")
     parser.add_argument("--complete", type=int, help="Mark a task completed by index")
     parser.add_argument("--delete", type=int, help="Delete a task by index")
+    parser.add_argument("--search", type=str, help="Search Tasks by Keyword")
+    parser.add_argument("--undo", action="store_true", help="Undo last action")
+    parser.add_argument("--clearc", action="store_true", help="Cleared Completed Tasks")
+
+    parser.add_argument("--menu", action="store_true", help="Launch an Interactive menu")
 
     return parser.parse_args()
 
 
 if __name__ == '__main__':
 
-    load_tasks()
-    check_due_tasks()
-
     args = parse_args()
 
+    if args.tasklist:
+        switch_task_list(f"{args.tasklist.strip().lower()}.json")
+    else:
+        load_tasks()
     if args.add:
         add_task(args.add, args.priority, args.due)
     elif args.view:
@@ -123,5 +137,18 @@ if __name__ == '__main__':
         mark_task_completed(args.complete - 1)
     elif args.delete is not None:
         delete_task(args.delete - 1)
+    elif args.search:
+        results = search_tasks(args.search)
+        if results:
+            for i, task in enumerate(results, 1):
+                print(f"{i}. {task}")
+        else:
+            print("No matching tasks found!")
+    elif args.undo:
+        undo_last_action()
+    elif args.clearc:
+        clear_completed()
+    elif args.menu:
+        main()
     else:
         main()

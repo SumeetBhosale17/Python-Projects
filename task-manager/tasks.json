@@ -5,5 +5,33 @@
         "completed": false,
         "timestamp": "2025-08-02T18:15:33.141529",
         "due_date": null
+    },
+    {
+        "title": "Coding Practice",
+        "priority": "Medium",
+        "completed": false,
+        "timestamp": "2025-08-02T23:27:47.861248",
+        "due_date": null
+    },
+    {
+        "title": "Study Python",
+        "priority": "High",
+        "completed": false,
+        "timestamp": "2025-08-02T23:31:05.570768",
+        "due_date": "2025-09-01"
+    },
+    {
+        "title": "task1",
+        "priority": "High",
+        "completed": false,
+        "timestamp": "2025-08-02T23:32:10.182584",
+        "due_date": "2025-08-02"
+    },
+    {
+        "title": "task2",
+        "priority": "Low",
+        "completed": false,
+        "timestamp": "2025-08-02T23:34:08.226880",
+        "due_date": "2025-08-01"
     }
 ]

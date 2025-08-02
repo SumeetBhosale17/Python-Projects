@@ -1,4 +1,6 @@
 from datetime import datetime
+import json
+import os
 
 from colorama import Fore
 
@@ -32,12 +34,33 @@ def check_due_tasks():
             except ValueError:
                 print(f"Invalid due date format for task: {task.title}")
 
-            if overdue:
-                print("\nOverdue Tasks: ")
-                for task in overdue:
-                    print(f"{Fore.RED}{task.title} (Due: {task.due_date})")
+    if overdue:
+        print("\nOverdue Tasks: ")
+        for task in overdue:
+            print(f"{Fore.RED}{task.title} (Due: {task.due_date})")
 
-            if due_date:
-                print("\nTask Due Today: ")
-                for task in due_today:
-                    print(f"{Fore.RED}{task.title} (Due: {task.due_date})")
+    if due_today:
+        print("\nTask Due Today: ")
+        for task in due_today:
+            print(f"{Fore.RED}{task.title} (Due: {task.due_date})")
+
+
+def save_backup(tasks):
+    backup_file = "backup.bak"
+
+    if os.path.exists(backup_file):
+        with open(backup_file, 'r') as f:
+            try:
+                history = json.load(f)
+            except json.JSONDecodeError:
+                history = []
+    else:
+        history = []
+    
+    history.append([task.to_dict() for task in tasks])
+
+    if len(history) > 20:
+        history = history[-20:]
+    
+    with open(backup_file, 'w') as f:
+        json.dump(history, f, indent=4)

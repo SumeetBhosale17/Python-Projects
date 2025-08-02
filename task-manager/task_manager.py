@@ -1,6 +1,7 @@
+import os
+
 from task import Task
 import json
-import copy
 
 from colorama import init, Fore
 init(autoreset=True)
@@ -50,6 +51,9 @@ def add_task(title, priority="Medium", due_date=None):
 def view_tasks():
     if not tasks:
         print("No tasks yet!")
+    from utils import check_due_tasks
+    check_due_tasks()
+    print('\n')
     for i, task in enumerate(tasks, 1):
         print(f"{i}. {task}")
 
@@ -111,6 +115,8 @@ def task_summary():
 
     print("\n📊 Task Summary")
     print("-" * 20)
+    from utils import check_due_tasks
+    check_due_tasks()
     print(Fore.CYAN + f"📝 Total Tasks    : {total}")
     print(Fore.LIGHTGREEN_EX + f"✅ Completed      : {completed}")
     print(Fore.RED + f"⏳ Pending        : {pending}")
@@ -125,22 +131,38 @@ def switch_task_list(filename):
     print(f"Switched to task list: {filename.split('.')[0]}")
 
 
-MAX_UNDO = 20
-undo_stack = []
-
-
 @autosave
 def push_undo_state():
-    if len(undo_stack) >= MAX_UNDO:
-        undo_stack.pop(0)
-    undo_stack.append(copy.deepcopy(tasks))
+    from utils import save_backup
+    save_backup(tasks)
 
 
 @autosave
 def undo_last_action():
-    if undo_stack:
-        global tasks
-        tasks = undo_stack.pop()
-        print("Undid last action!")
-    else:
-        print("Nothing to undo!")
+    global tasks
+    backup_file = "backup.bak"
+
+    if not os.path.exists(backup_file):
+        print(f"{Fore.RED}No backup found, nothing to undo!")
+        return
+    
+    with open(backup_file, 'r') as f:
+        try:
+            history = json.load(f)
+        except json.JSONDecodeError:
+            print(f"{Fore.RED}Backup is Corrupted!")
+            return
+        
+    if len(history) < 2:
+        print(f"{Fore.RED}No undo history available!")
+        return
+    
+    history.pop()
+
+    last_snapshot = history[-1]
+    tasks = [Task.from_dict(item) for item in last_snapshot]
+
+    with open(backup_file, 'w') as f:
+        json.dump(history, f, indent=4)
+    
+    print(f"{Fore.YELLOW}Last action was undone successfully!")
